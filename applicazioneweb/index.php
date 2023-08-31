@@ -179,13 +179,6 @@
 
                     //si ricava lo stato di tutte le interfacce dello switch $switch_id_array[$i]
                     $state=get_port_state($switch_id_array, $i);
-                
-                    //$arr2=array();
-
-                    //si svuota l+array ogni volta dato che ogni switch potrebbe avere un numero di porte diverso e nelle righe della tabella verrebbero aggiunti dati di altri switch
-                    //in alune righe
-                    //array_splice($single_switch, 0, count($single_switch));
-                    //array_splice($arr2, 0, count($arr2));
 
                     //si ricavano le righe della tabella porte dello switch
                     $single_switch=get_port_table_raw($switch_id_array, $i);

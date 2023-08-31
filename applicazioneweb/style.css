@@ -1,5 +1,6 @@
 
 body {
+    background-color: rgb(207, 207, 252);
     margin: 0;
     
   }
@@ -94,14 +95,14 @@ img{
     border: 8px;
     border-style: solid;
     background-color: #d5fbfb;
-    border-color: aquamarine;
+    border-color: deepskyblue;
 }
 
 #topology{
 
     margin-top:4%;
     margin-left:20%;
-    color:blue; 
+    color:#003d99; 
     font-size: 20px;
     
 }
@@ -133,7 +134,7 @@ table {
 .flow_table{
 
     margin-left:5%; 
-    color:blue; 
+    color:#003d99; 
     font-size: 20px;
 
 }
