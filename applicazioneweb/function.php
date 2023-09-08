@@ -118,6 +118,13 @@
                 }else if($key1=='dst-switch'){
 
                     $switch_link_array[$count]= $switch_link_array[$count]."-".$val;
+
+                }else if($key1=='src-port'){
+
+                    $switch_link_array[$count]= $switch_link_array[$count]."-".$val;
+                }else if($key1=='dst-port'){
+
+                    $switch_link_array[$count]= $switch_link_array[$count]."-".$val;
                 }
                 
             }
@@ -173,6 +180,9 @@
                                 
                                 if($key4=='switch'){
                                     //concatena l'id dell'host aćollegato a quello switch
+                                    $host_switch_link1[$count]= $host_switch_link1[$count]."-".$val4;
+                                }else if($key4=='port'){
+                                    //concatena l'id della porta dello switch a cui l'host è collegato
                                     $host_switch_link1[$count]= $host_switch_link1[$count]."-".$val4;
                                 }
                             }

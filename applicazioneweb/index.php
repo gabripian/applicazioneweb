@@ -60,30 +60,97 @@
             $host_id_array=array();
             //array contenente le coppie indirizzo dell'host e identificatore dello switch a cui è collegato l'host, separati da un trattino -
             $host_switch_link=array();
+            //array contenente i link tra switch con i numeri di porta a cui gli switch sono collegati
+            $switch_link_id=array();
+            //array contenente indirizzo dell'host e identificatore dello switch a cui è collegato l'host, separati da un trattino e separati da un trattino dal numero di porta dello switch
+            $host_switch_link_id=array();
+            //array che contiene le statistiche di tutte le porte di tutti gli switch
+            $switch_statistics=array();
+            //array contenente la tabella dei flussi per ciascuno switch
+            $switch_flow_array=array();
+
+
 
             //si ottengono gli id degli switch ordinati in ordine crescente
             $switch_id_array=get_switch_id();
 
             //si ottengono i link tra switch
-            $switch_link_array=get_switch_link();
+            $switch_link_id=get_switch_link();
 
             //si ottengono i link tra host e switch
-            $host_switch_link=get_host_switch_link();
+            $host_switch_link_id=get_host_switch_link();
+
+            //si ottengono i link tra switch come gli id degli switch separati da un trattino
+            foreach($switch_link_id as $key => $value) {
+                
+                $switch_link_array[$key]=substr($switch_link_id[$key], 0, 23);
+                $switch_link_array[$key]=$switch_link_array[$key].substr($switch_link_id[$key], 25, 24);
+                //echo $switch_link_array[$key]. "<br>";    
+            }
+
+            //si ottengono le coppie id host-id switch
+            foreach($host_switch_link_id as $key => $value) {
+                //si rimuove il carattere -numero di porta
+                $host_switch_link[$key]=substr($host_switch_link_id[$key], 0, 41);
+               //echo $host_switch_link[$key]. "<br>";
+            }
 
             //si assegnano al relativo vettore, gli identificatori di ciascun host già ricavati e salvati in $host_switch_link concatenati con gli id degli switch collegati
             foreach($host_switch_link as $key => $value) {
                 //gli identificatori sono lunghi 17 caratteri
                 $host_id_array[$key]=substr($host_switch_link[$key], 0, 17);
-               
-
             }
 
             //si ordinano gli id degli host
             sort($host_id_array);
+
+            //numero totale di switch
+            $count = count($switch_id_array);
+            
+
+            for($i=0; $i< $count; $i++){
+
+                //si assegna anche l+id dello switch che non viene restituito da get_port_table_row
+                array_push($switch_statistics, $switch_id_array[$i]);
+               
+                //si ricavano le righe della tabella porte dello switch
+                $switch_statistics1=get_port_table_raw($switch_id_array, $i);
+
+                for($j=0; $j< count($switch_statistics1); $j++){
+                    array_push($switch_statistics, $switch_statistics1[$j]);
+                }
+            }
+            /*
+            foreach($switch_statistics as $key => $value){
+
+                echo $key. "=>". $value."<br>";
+
+            }
+            */
+
+            for($i=0; $i< $count; $i++){
+
+                //si ricavano le statistiche dei flussi per ciascuno switch
+                array_push($switch_flow_array, $switch_id_array[$i]);
+                //si ricavano le righe della tabella dei flussi dello switch
+                $switch_flow_array1=get_flow_table_row($switch_id_array, $i);
+
+                for($j=0; $j< count($switch_flow_array1); $j++){
+
+                    array_push($switch_flow_array, $switch_flow_array1[$j]);
+                }                             
+            }
             
         ?>
         <div id="topology">Network Topology</div>      
         <div id="container"></div>
+
+        <div id="popup" class="popup">
+            <div class="popup-content">
+                
+                <div id="popup-content"></div>
+            </div>
+        </div>
 
         <script>
            
@@ -92,9 +159,13 @@
             var switch_link_array = <?php echo json_encode($switch_link_array); ?>;
             var host_switch_link = <?php echo json_encode($host_switch_link); ?>;
             var host_id_array = <?php echo json_encode($host_id_array); ?>;
+            var host_switch_link_id = <?php echo json_encode($host_switch_link_id); ?>;
+            var switch_statistics = <?php echo json_encode($switch_statistics); ?>;
+            var switch_link_id = <?php echo json_encode($switch_link_id); ?>;
+            var switch_flow_array = <?php echo json_encode($switch_flow_array); ?>;
 
             //si crea la topologia della rete
-            create_network(switch_id_array, switch_link_array, host_switch_link, host_id_array);
+            create_network(switch_id_array, switch_link_array, host_switch_link, host_id_array, host_switch_link_id, switch_statistics, switch_link_id, switch_flow_array);
     
         </script>
         
