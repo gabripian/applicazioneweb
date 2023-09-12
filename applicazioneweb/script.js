@@ -1,7 +1,8 @@
 
 //funzione per creare la topologia della rete
-function create_network(switch_id_array, switch_link_array, host_switch_link, host_id_array, host_switch_link_id, switch_statistics, switch_link_id, switch_flow_array){
+function create_network(switch_id_array, switch_link_array, host_switch_link, host_id_array, host_switch_link_id, switch_statistics, switch_link_id, switch_flow_array, bandwidth_array){
 
+    //alert("entro?");
     //alert(switch_link_id);
     //alert("link id "+host_switch_link_id);
     //alert("statistics "+switch_statistics);
@@ -86,6 +87,7 @@ function create_network(switch_id_array, switch_link_array, host_switch_link, ho
     var popupContent = document.getElementById('popup-content');
     var hoveringEdge = false; // Flag per tracciare se il mouse è sopra un edge
 
+    //alert("entro1?");
     
    // Aggiungi l'evento hoverNode per gestire il passaggio del mouse sugli archi
     network.on("hoverEdge", function (event) {
@@ -94,6 +96,9 @@ function create_network(switch_id_array, switch_link_array, host_switch_link, ho
 
         var links = edge.split('-');
         var port;
+        var bandwidth;
+        var src_bandwidth;
+        var dst_bandwidth;
         //alert(links[0]);
         //alert(links[1]);
        
@@ -140,11 +145,24 @@ function create_network(switch_id_array, switch_link_array, host_switch_link, ho
                     table_hover[i]=switch_statistics[x+1+i];
                     
                 }
-                //alert(" table_hover= "+ table_hover);
+
+                //alert("entro2?");
+
+                //si ricava la bandwidth relativa
+                for(var i=0; i<bandwidth_array.length; i++){
+                    
+                    bandwidth=bandwidth_array[i].split("-");
+                    //se lo switch e la porta corrispondono si assegna la bandwidth (bandwidth[2])
+                    if(bandwidth[0] == links[1] && bandwidth[1] ==port){
+                    
+                        break;      
+                    }       
+                }
+                
+                //alert("entro3?");
 
 
-
-                popupContent.innerHTML = "Host: " + links[0] + "<br>Switch: " + links[1]+ "<br> Port: "+port+ "<br>"+
+                popupContent.innerHTML = "Host: " + links[0] + "<br>Switch: " + links[1]+ "<br> Port: "+port+ " Bandwidth: "+bandwidth[2]+"<br>"+
                 "<table id='table_host_switch'><tr><th>receive packets</th>"+
                 "<th>transmit packets</th>"+
                 "<th>receive bytes</th>"+
@@ -213,9 +231,25 @@ function create_network(switch_id_array, switch_link_array, host_switch_link, ho
 
                 //alert(" table_hover= "+ table_hover);
 
+                //alert("entro4?");
+                //sia ssegna al bandwidth relativa
+                for(var i=0; i<bandwidth_array.length; i++){
+                    
+                    bandwidth=bandwidth_array[i].split("-");
+                    //se lo switch e la porta corrispondono si assegna la bandwidth (bandwidth[2])
+                    if(bandwidth[0] == links[0] && bandwidth[1] ==src_port){
+                        
+                        src_bandwidth=bandwidth[2];
+                            
+                    }else if(bandwidth[0] == links[1] && bandwidth[1] ==dst_port){
+                        
+                        dst_bandwidth=bandwidth[2];     
+                    }       
+                }
 
+                //alert("entro5?");
 
-                popupContent.innerHTML = "src-Switch: " + links[0] + "<br> src-Port: "+ src_port + "<br>dst-Switch: " + links[1] + "<br> dst-Port: " + dst_port + "<br>"+
+                popupContent.innerHTML = "src-Switch: " + links[0] + "<br> src-Port: "+ src_port + " src-Bandwidth:"+src_bandwidth+ "<br>dst-Switch: " + links[1] + "<br> dst-Port: " + dst_port +" dst-Bandwidth:"+dst_bandwidth+ "<br>"+
                 "<table id='table_host_switch1'><tr><th>direction</th>"+
                 "<th>receive packets</th>"+
                 "<th>transmit packets</th>"+

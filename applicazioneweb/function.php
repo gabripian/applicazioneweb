@@ -1,4 +1,5 @@
 <?php
+    
     //resttuisce il numerro di switch, host e link in un array
     function get_summary(){ //http://127.0.0.1:8080/wm/core/controller/summary/json con questo link si riescono ad ottenere il numero di switch, host e link tra switch i quali sono bidirezionali
         
@@ -370,8 +371,61 @@
         return  $single_switch;
     } 
 
+    function get_bandwidth($switch_id_array){
 
+       
+        //numero di switch nella rete
+        $count = count($switch_id_array);
 
+        $single_switch=array();
+        
+        $bandwidth_array=array();
+
+        //array di supporto per aggiornare il vettore globale
+        //$support=array();
+
+        $j=0;
+        $bandwidth=0;
+
+            //si scorre per ciascuno switch
+            for($i=0; $i< $count; $i++){
+
+                //si ricavano le righe della tabella porte dello switch
+                $single_switch=get_port_table_raw($switch_id_array, $i);
+                    
+                //per ciascuna porta si ottengono 10 informazioni, dividendo di un fattore 10 si ottiene il numero di porte di ogni switch
+                $single_switch_length=count($single_switch)/10;
+
+                for($l=0; $l<$single_switch_length; $l++){
+
+                    $bandwidth_array[$j]=$switch_id_array[$i];
+                    $bandwidth_array[$j]=$bandwidth_array[$j]. "-" .$single_switch[0];
+
+                    //supporto per raccogliere i dati da assegnare al vettore globale
+                    //$support[$j]=$bandwidth_array[$j];
+                    //$support[$j]=$support[$j]."-".$single_switch[4]."-".$single_switch[9];
+                    //si calcola la banda
+                           
+                    //si divide il numero di byte con i secondi trascorsi e si moltiplica per 8 in modo da avere il risultato in bps
+                    $bandwidth=($single_switch[4]/$single_switch[9])*8;
+
+                    //si mostrano solo 2 cifre dopo la virgola
+                    $bandwidth=number_format($bandwidth, 2);
+
+                    //vettore risultato finale
+                    $bandwidth_array[$j]=$bandwidth_array[$j]. "-" . $bandwidth. "-". $single_switch[9];
+                        
+                    //si fanno avanzare i dati di 10 posizioni
+                    array_splice($single_switch, 0, 10);
+                    $j++;         
+                }
+    
+            }
+    
+            sort($bandwidth_array);
+
+            return $bandwidth_array;
+    }
 
 //si scambiano 10 elementi del vettore con altri 10 elementi se una porta con numero maggiore precede una porta con numero minore    
 function array_sort($single_switch, $single_switch_length){

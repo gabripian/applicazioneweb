@@ -6,11 +6,15 @@
     $switch_statistics=array();
     //array contenente la tabella dei flussi per ciascuno switch
     $switch_flow_array=array();
+    //array che contiene la abnda di ciascuna porta
+    $bandwidth_array= array();
+
 
     //si aggiornano i dati utilizzando le funzioni definite nel file function.php
     $switch_id_array = get_switch_id();
     $switch_link_id = get_switch_link();
     $host_switch_link_id = get_host_switch_link();
+    $bandwidth_array=get_bandwidth($switch_id_array);
 
     //si ottengono i link tra switch come gli id degli switch separati da un trattino
     foreach($switch_link_id as $key => $value) {
@@ -66,11 +70,12 @@
             array_push($switch_flow_array, $switch_flow_array1[$j]);
         }                             
     }
+
     
 
     //si crea un array con i nuovi dati
     $updated_data = array(
-        'switch_id_array' => $switch_id_array, 'switch_link_array' =>  $switch_link_array, 'host_switch_link' => $host_switch_link, 'host_id_array' => $host_id_array, 'host_switch_link_id' => $host_switch_link_id, 'switch_statistics' => $switch_statistics, 'switch_link_id' => $switch_link_id, 'switch_flow_array' => $switch_flow_array
+        'switch_id_array' => $switch_id_array, 'switch_link_array' =>  $switch_link_array, 'host_switch_link' => $host_switch_link, 'host_id_array' => $host_id_array, 'host_switch_link_id' => $host_switch_link_id, 'switch_statistics' => $switch_statistics, 'switch_link_id' => $switch_link_id, 'switch_flow_array' => $switch_flow_array, 'bandwidth_array' => $bandwidth_array
     );
 
     //si restituiscono i dati aggiornati in formato JSON

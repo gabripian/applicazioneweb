@@ -52,6 +52,32 @@ function updatePortTable() {
 setInterval(updatePortTable, 60000); 
 
 
+
+//funzione per aggiornare la tabella delle bandwidth
+function updateBandwidthTable() {
+
+    //si crea un ogetto XMLHttpRequest
+    var xhr = new XMLHttpRequest();
+    
+    //funzione chiamata quando la proprietà readyState cambia, questa proprietø indica lo stato di XMLHttpRequest
+    xhr.onreadystatechange = function() {
+        
+        //controllo se i dati sono pronti o no
+        if(xhr.readyState == 4 && xhr.status == 200){
+            //si aggiorna la tabella contenuta nel div con i dati ottenuti sottoforma di stringa
+            document.querySelector('#bandwidth_table_container').innerHTML = xhr.responseText;
+        }     
+    };
+    
+    //richiesta asincrona alla pagina di aggiornamento
+    xhr.open('GET', 'update_bandwidth_table.php', true);
+    //richiesta viene inviata in rete
+    xhr.send();
+}
+
+//aggiornamento viene effettuato ogni minuto (espresso in millisecondi)
+setInterval(updateBandwidthTable, 60000); 
+
 //funzione per aggiornare il numero di switch, host e link
 function updateSummary() {
 
@@ -97,7 +123,7 @@ function updateTopology() {
                 var updatedData = JSON.parse(xhr.responseText);
                 
                 //si richiama la funzione che crea la topologia con i nuovi dati
-                create_network(updatedData.switch_id_array, updatedData.switch_link_array, updatedData.host_switch_link, updatedData.host_id_array, updatedData.host_switch_link_id, updatedData.switch_statistics, updatedData.switch_link_id, updatedData.switch_flow_array);
+                create_network(updatedData.switch_id_array, updatedData.switch_link_array, updatedData.host_switch_link, updatedData.host_id_array, updatedData.host_switch_link_id, updatedData.switch_statistics, updatedData.switch_link_id, updatedData.switch_flow_array, updatedData.bandwidth_array);
         }
         
     };
