@@ -1,4 +1,10 @@
 <?php
+
+    //si inizializza una sessione per mantenere le informazioni sui byte trasmessi in precedenza
+    session_start();
+?>
+
+<?php
     
     //resttuisce il numerro di switch, host e link in un array
     function get_summary(){ //http://127.0.0.1:8080/wm/core/controller/summary/json con questo link si riescono ad ottenere il numero di switch, host e link tra switch i quali sono bidirezionali
@@ -402,12 +408,42 @@
                     $bandwidth_array[$j]=$bandwidth_array[$j]. "-" .$single_switch[0];
 
                     //supporto per raccogliere i dati da assegnare al vettore globale
-                    //$support[$j]=$bandwidth_array[$j];
-                    //$support[$j]=$support[$j]."-".$single_switch[4]."-".$single_switch[9];
+                    //id dello switch-porta dello switch
+                    $support[$j]=$bandwidth_array[$j];
+                    //si concatena con byte trasmessi e tempo trascorso
+                    $support[$j]=$support[$j]."-".$single_switch[4]."-".$single_switch[9];
                     //si calcola la banda
-                           
-                    //si divide il numero di byte con i secondi trascorsi e si moltiplica per 8 in modo da avere il risultato in bps
-                    $bandwidth=($single_switch[4]/$single_switch[9])*8;
+
+                    //se il vettore di sessione non è vuoto
+                    if(isset($_SESSION["bandwidth_session_array"]) && !empty($_SESSION["bandwidth_session_array"])) {
+                        
+                        //si controlla lo switch e la porta
+
+                        $pos=bandwidth_position($bandwidth_array[$j]);
+
+                        //echo "-------------------------------bandwidth_array[j]".$bandwidth_array[$j]."<br>";
+                        //echo "-------------------------------_SESSION[+bandwidth_session_array+][pos];".$_SESSION["bandwidth_session_array"][$pos]."<br>";
+                        //echo "--------------------------------byte-time:".$single_switch[4]."-".$single_switch[9]."<br>";
+                        //se lo switch e porta selezionati non erano stati salvati, quindi sono nuovi, si calcola dall'inizio
+                        if($pos==-1){
+                            $bandwidth=($single_switch[4]/$single_switch[9])*8;
+                        }else{
+                            //si ricava la riga del vettore di sessione corrispondente allo switch corrente
+                            $row=$_SESSION["bandwidth_session_array"][$pos];
+                            $row1=explode("-",$row);
+
+                            $bandwidth=(($single_switch[4]-$row1[2])/($single_switch[9]-$row1[3]))*8;
+                            //echo "-------------------------------------bandwidth:".$bandwidth."<br>";
+                            
+                        }
+                        session_write_close();
+
+                    }else{
+
+                        //si divide il numero di byte con i secondi trascorsi e si moltiplica per 8 in modo da avere il risultato in bps
+                        $bandwidth=($single_switch[4]/$single_switch[9])*8;
+                    }
+                   
 
                     //si mostrano solo 2 cifre dopo la virgola
                     $bandwidth=number_format($bandwidth, 2);
@@ -421,11 +457,40 @@
                 }
     
             }
-    
+
+            session_start();
+            //si azzera l'array di sessione
+            $_SESSION["bandwidth_session_array"] = array();
+
+            //si aggiorna il vettore di sessione con i nuovi dati
+            for($i=0; $i<count($support); $i++){ 
+
+                $_SESSION["bandwidth_session_array"][$i]=$support[$i];
+
+            }
+            session_write_close();
             sort($bandwidth_array);
 
             return $bandwidth_array;
     }
+
+function bandwidth_position($bandwidth_string){
+
+    $pos = -1;
+
+    // Utilizza un ciclo foreach per scorrere l'array
+    foreach ($_SESSION["bandwidth_session_array"] as $key => $value) {
+        // Cerca la sottostringa nella stringa corrente
+        if (strpos($value, $bandwidth_string) !== false) {
+            // La sottostringa è stata trovata, memorizza l'indice e esci dal ciclo
+            $pos = $key;
+            break;
+        }
+    }
+
+    return $pos;
+
+}
 
 //si scambiano 10 elementi del vettore con altri 10 elementi se una porta con numero maggiore precede una porta con numero minore    
 function array_sort($single_switch, $single_switch_length){

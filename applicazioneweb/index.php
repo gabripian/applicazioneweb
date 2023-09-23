@@ -1,3 +1,8 @@
+<?php
+    //si inizializza una sessione per mantenere le informazioni sui byte trasmessi in precedenza
+    session_start();
+?>
+
 <!DOCTYPE html>
 <html>
 
@@ -29,6 +34,14 @@
     </head>
 
     <body>
+
+
+        <?php
+
+            //si crea il vettore di sessione
+            //$_SESSION["bandwidth_session_array"] = array();
+        
+        ?>
 
         <div class="navbar">
             <a href="index.php"><img src="images/home.png" alt="Home Icon"> Topology (Home)</a>
@@ -156,6 +169,7 @@
 
             }
             */
+            
 
             
         ?>

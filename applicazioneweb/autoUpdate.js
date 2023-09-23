@@ -21,7 +21,7 @@ function updateFlowTable() {
 }
 
 //aggiornamento viene effettuato ogni minuto (espresso in millisecondi)
-setInterval(updateFlowTable, 60000); 
+setInterval(updateFlowTable, 10000); 
 
 
 
@@ -49,7 +49,7 @@ function updatePortTable() {
 }
 
 //aggiornamento viene effettuato ogni minuto (espresso in millisecondi)
-setInterval(updatePortTable, 60000); 
+setInterval(updatePortTable, 10000); 
 
 
 
@@ -71,12 +71,13 @@ function updateBandwidthTable() {
     
     //richiesta asincrona alla pagina di aggiornamento
     xhr.open('GET', 'update_bandwidth_table.php', true);
+    //xhr.open('GET', 'update_bandwidth_table.php?nocache=' + new Date().getTime(), true);
     //richiesta viene inviata in rete
     xhr.send();
 }
 
 //aggiornamento viene effettuato ogni minuto (espresso in millisecondi)
-setInterval(updateBandwidthTable, 60000); 
+setInterval(updateBandwidthTable, 10000); 
 
 //funzione per aggiornare il numero di switch, host e link
 function updateSummary() {
@@ -101,7 +102,7 @@ function updateSummary() {
 }
 
 //aggiornamento viene effettuato ogni minuto (espresso in millisecondi)
-setInterval(updateSummary, 60000); 
+setInterval(updateSummary, 10000); 
 
 
 //funzione per aggiornare la topologia della rete
@@ -134,7 +135,7 @@ function updateTopology() {
 }
 
 //aggiornamento viene effettuato ogni minuto (espresso in millisecondi)
-setInterval(updateTopology, 60000);
+setInterval(updateTopology, 10000);
 
 
 
