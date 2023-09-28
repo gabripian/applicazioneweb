@@ -170,7 +170,7 @@ table {
     padding: 15px;
     border: 2px solid cornflowerblue;
     border-radius: 5px;
-    width: 50%;
+    width: 52%;
     box-shadow: 0px 0px 10px deepskyblue;
     position: relative;
     
@@ -203,7 +203,6 @@ table {
     font-size:14px;
 }
 
-
 .navbar {
     height: 138%;
     width: 9%;
@@ -215,22 +214,55 @@ table {
     overflow-x: hidden;
     display: inline-block;
    
-  }
   
-  .navbar a {
+}
+  
+.navbar a {
     padding:  8px 4px 16px;
     text-decoration: none;
     font-size: 14px;
     border-bottom: 1px solid deepskyblue;
     display: block;
     color: #003d99;
-  }
   
-  .navbar a:hover {
+}
+  
+.navbar a:hover {
     color: cornflowerblue;
-  }
+}
   
-  .navbar img {
+.navbar img {
     padding:  8px 1px 0px;
     display: inline-block;
-  }
+}
+
+form {
+    margin-top: 3%;
+    margin-left:16%;
+    font-size:18px;
+}
+
+select {
+    background-color: deepskyblue;
+    color:white;
+    border-radius:5px;
+    font-size: 16px; 
+    width: 200px; 
+    padding: 10px; 
+    border: 2px solid blueviolet;
+    cursor:pointer;
+  
+}
+
+button {
+    background-color: cornflowerblue;
+    color:white;
+    border-radius:5px;
+    font-size: 16px; 
+    width: 200px; 
+    padding: 10px; 
+    border: 2px solid blueviolet;
+    margin-left:2%;
+    cursor:pointer;
+  
+}

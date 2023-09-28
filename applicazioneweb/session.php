@@ -3,4 +3,6 @@
     session_start();
 
     $_SESSION["bandwidth_session_array"] = array();
+    //$_SESSION["max_throughput_array"] = array();
+    //$_SESSION["inactive_flow_array"] = array();
 ?>

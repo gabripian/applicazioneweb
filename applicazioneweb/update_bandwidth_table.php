@@ -22,6 +22,8 @@
     $bandwidth_Table_HTML .= '<th>switch id</th>';
     $bandwidth_Table_HTML .= '<th>port number</th>';
     $bandwidth_Table_HTML .= '<th>bandwidth (bps)</th>';
+    $bandwidth_Table_HTML .= '<th>max bandwidth (bps)</th>';
+    $bandwidth_Table_HTML .= '<th>inactive time (sec)</th>';
     $bandwidth_Table_HTML .= '<th>duration (sec)</th>';
     $bandwidth_Table_HTML .= '</tr>';
 
@@ -37,6 +39,8 @@
         $bandwidth_Table_HTML .= '<td>' .$row1[0]. '</td>';
         $bandwidth_Table_HTML .= '<td>' .$row1[1]. '</td>';
         $bandwidth_Table_HTML .= '<td>' .$row1[2]. '</td>';
+        $bandwidth_Table_HTML .= '<td>' .$row1[4]. '</td>';
+        $bandwidth_Table_HTML .= '<td>' .$row1[5]. '</td>';
         $bandwidth_Table_HTML .= '<td>' .$row1[3]. '</td>';
         $bandwidth_Table_HTML .= '</tr>';
 

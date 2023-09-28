@@ -61,6 +61,8 @@
                     <th>switch id</th>
                     <th>port number</th>
                     <th>bandwidth (bps)</th>
+                    <th>max bandwidth (bps)</th>
+                    <th>inactive time (sec)</th>
                     <th>duration (sec)</th>
                 </tr>';
  
@@ -74,6 +76,8 @@
                         <td>' .$row1[0]. '</td>
                         <td>' .$row1[1]. '</td>
                         <td>' .$row1[2]. '</td>
+                        <td>' .$row1[4]. '</td>
+                        <td>' .$row1[5]. '</td>
                         <td>' .$row1[3]. '</td>
                     </tr>';
         

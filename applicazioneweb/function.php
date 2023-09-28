@@ -392,6 +392,11 @@
 
         $j=0;
         $bandwidth=0;
+        //contiene il valore massimo di banda per ciascuna interfaccia
+        $max_bandwidth=0;
+        //tempo in cui interfaccia inattiva
+        $inactive_time=0;
+
 
             //si scorre per ciascuno switch
             for($i=0; $i< $count; $i++){
@@ -410,6 +415,8 @@
                     //supporto per raccogliere i dati da assegnare al vettore globale
                     //id dello switch-porta dello switch
                     $support[$j]=$bandwidth_array[$j];
+                    //serve per il massimo
+                    //$support1[$j]= $support[$j];
                     //si concatena con byte trasmessi e tempo trascorso
                     $support[$j]=$support[$j]."-".$single_switch[4]."-".$single_switch[9];
                     //si calcola la banda
@@ -420,6 +427,7 @@
                         //si controlla lo switch e la porta
 
                         $pos=bandwidth_position($bandwidth_array[$j]);
+                        //$pos1=max_position($bandwidth_array[$j]);
 
                         //echo "-------------------------------bandwidth_array[j]".$bandwidth_array[$j]."<br>";
                         //echo "-------------------------------_SESSION[+bandwidth_session_array+][pos];".$_SESSION["bandwidth_session_array"][$pos]."<br>";
@@ -427,6 +435,13 @@
                         //se lo switch e porta selezionati non erano stati salvati, quindi sono nuovi, si calcola dall'inizio
                         if($pos==-1){
                             $bandwidth=($single_switch[4]/$single_switch[9])*8;
+                            $max_bandwidth=$bandwidth;
+                            //se bandwidth == 0, a time si assegna $single_switch[9]
+                            if($bandwidth == 0){
+                                $inactive_time=$single_switch[9];
+                            }else{
+                                $inactive_time=0;
+                            }
                         }else{
                             //si ricava la riga del vettore di sessione corrispondente allo switch corrente
                             $row=$_SESSION["bandwidth_session_array"][$pos];
@@ -434,6 +449,38 @@
 
                             $bandwidth=(($single_switch[4]-$row1[2])/($single_switch[9]-$row1[3]))*8;
                             //echo "-------------------------------------bandwidth:".$bandwidth."<br>";
+                            //se c'è un nuovo valore massimo, si aggiorna
+                            //echo "-------------------------------row1[4]=".$row1[4]."bandwidth=".$bandwidth."<br>";
+                            //dato che se viaggiano MB e GB, i numeri sono rappresentati con la virgola (707,127.00) allora si elimina il carattere virgola  
+                            $b=explode(",", $row1[4]);
+                            $row1[4]="";
+                            for($w=0;$w<count($b); $w++){
+                                $row1[4]= $row1[4].$b[$w];
+                            }
+
+                            $e=explode(",", $bandwidth);
+                            $bandwidth="";
+                            for($w=0;$w<count($e); $w++){
+                                $bandwidth= $bandwidth.$e[$w];
+                            }
+                            
+                            if($row1[4] < $bandwidth){
+                                $max_bandwidth=$bandwidth;
+                                
+                            }else{
+                                $max_bandwidth=$row1[4];
+                            }
+
+                            //se bandwidth == 0, a time si aggiungono 10 secondi
+                            if($bandwidth == 0){
+                                //se un valore vale ancora 0, si aggiunge il tempo di aggiornamento trascorso
+                                $row1[5]+=$single_switch[9]-$row1[3];
+                                $inactive_time=$row1[5];
+                            }else{
+                                $inactive_time=0;
+                            }
+                            
+                            //echo "-------------------------------max_bandwidth=".$max_bandwidth."<br>";
                             
                         }
                         session_write_close();
@@ -442,14 +489,26 @@
 
                         //si divide il numero di byte con i secondi trascorsi e si moltiplica per 8 in modo da avere il risultato in bps
                         $bandwidth=($single_switch[4]/$single_switch[9])*8;
+                        //si assegna la massima bandwidth, che nel primo caso corrisponde alla bandwidth appena calcolata
+                        $max_bandwidth=$bandwidth;
+                        //se bandwidth == 0, a time si assegna $single_switch[9]
+                        if($bandwidth == 0){
+                            $inactive_time=$single_switch[9];
+                        }else{
+                            $inactive_time=0;
+                        }
                     }
                    
-
+                    
+                   
                     //si mostrano solo 2 cifre dopo la virgola
                     $bandwidth=number_format($bandwidth, 2);
+                    $max_bandwidth=number_format($max_bandwidth, 2);
+
+                    $support[$j]=$support[$j]. "-" . $max_bandwidth ."-". $inactive_time;
 
                     //vettore risultato finale
-                    $bandwidth_array[$j]=$bandwidth_array[$j]. "-" . $bandwidth. "-". $single_switch[9];
+                    $bandwidth_array[$j]=$bandwidth_array[$j]. "-" . $bandwidth. "-". $single_switch[9]. "-" . $max_bandwidth ."-". $inactive_time;
                         
                     //si fanno avanzare i dati di 10 posizioni
                     array_splice($single_switch, 0, 10);
@@ -462,6 +521,8 @@
             //si azzera l'array di sessione
             $_SESSION["bandwidth_session_array"] = array();
 
+            //$_SESSION["max_throughput_array"] = array();
+
             //si aggiorna il vettore di sessione con i nuovi dati
             for($i=0; $i<count($support); $i++){ 
 
@@ -469,6 +530,15 @@
 
             }
             session_write_close();
+            /*
+            //si aggiorna il vettore di sessione max con i nuovi dati
+            for($i=0; $i<count($support1); $i++){ 
+
+                $_SESSION["max_throughput_array"][$i]=$support1[$i];
+
+            }
+            session_write_close();
+            */
             sort($bandwidth_array);
 
             return $bandwidth_array;
@@ -491,6 +561,25 @@ function bandwidth_position($bandwidth_string){
     return $pos;
 
 }
+/*
+function max_position($bandwidth_string){
+
+    $pos = -1;
+
+    // Utilizza un ciclo foreach per scorrere l'array
+    foreach ($_SESSION["max_throughput_array"] as $key => $value) {
+        // Cerca la sottostringa nella stringa corrente
+        if (strpos($value, $bandwidth_string) !== false) {
+            // La sottostringa è stata trovata, memorizza l'indice e esci dal ciclo
+            $pos = $key;
+            break;
+        }
+    }
+
+    return $pos;
+
+}
+*/
 
 //si scambiano 10 elementi del vettore con altri 10 elementi se una porta con numero maggiore precede una porta con numero minore    
 function array_sort($single_switch, $single_switch_length){

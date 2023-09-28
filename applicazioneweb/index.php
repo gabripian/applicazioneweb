@@ -71,10 +71,47 @@
             <div id="link"><img src="images/networking.png" alt="Link Icon">Link<div class="number"><?php echo $num_link; ?></div></div>
         </div>
     
+        
+        <form>
+            <label for="bandwidth">Choose bandwidth range:</label>
+            <select name="bandwidth" id="bandwidth">
+                <option value="90-120">90-120</option>
+                <option value="110-140">110-140</option>
+                <option value="130-160">130-160</option>
+                <option value="150-180">150-180</option>
+            </select>
+            
+            <button id="button">Submit</button>
+           
+        </form>
+        <br>
+        <br>
 
+        <script>
+            //si salva lo stato selezionato
+            var select = document.getElementById("bandwidth");
+            var button = document.getElementById("button");
+           
+            //si recupera il valore selezionato precedentemente da localStorage (se esiste)
+            var ultimoValoreSelezionato = localStorage.getItem("ultimoValoreSelezionato");
+
+            //se un valore è stato memorizzato in precedenza, si assegna il valore
+            if (ultimoValoreSelezionato) {
+                select.value = ultimoValoreSelezionato;      
+            }
+
+            button.addEventListener("click", function() {
+                //aggiorna l'ultimo valore selezionato
+                ultimoValoreSelezionato = select.value;
+
+                //memorizza il valore selezionato in localStorage
+                localStorage.setItem("ultimoValoreSelezionato", ultimoValoreSelezionato);
+            });
+        </script>
+        
+        
 
         <?php
-
 
             //array che contiene gli id degli switch
             $switch_id_array=array();

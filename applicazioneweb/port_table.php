@@ -94,6 +94,15 @@
                     //consecutivi dato che ogni 10 elementi dell'array sono riferiti ad un'unica porta
                     $single_switch=array_sort($single_switch, $single_switch_length);
                     
+                    //se il numero supera una certa cifra si rappresenta in notazione scientifica
+                    for($j=1; $j<count($single_switch); $j++){
+                        
+                        if($single_switch[$j] > 10000000){
+                            
+                            $single_switch[$j] = sprintf('%.2e', $single_switch[$j]);
+                              
+                        }
+                    }
 
                     for($l=0; $l<$single_switch_length; $l++){
 

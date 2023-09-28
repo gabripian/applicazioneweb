@@ -9,6 +9,7 @@ function create_network(switch_id_array, switch_link_array, host_switch_link, ho
     //vettore dei nodi del grafo
     var nodes = [];
 
+    
     //creazione dei nodi, si assegna a ciascun nodo switch una label con l'id dello switch e ciascun nodo è rappresentato con l'immagine dello switch
     switch_id_array.forEach(function(switchId) {
 
@@ -24,6 +25,8 @@ function create_network(switch_id_array, switch_link_array, host_switch_link, ho
     //vettore dei link del grafo
     var edges = [];
 
+    var edges1 = [];
+
     //creazione degli archi, si dividono gli elementi del vettore separati da un tattito -, questi elementi indicano il nodo sorgente ed il nodo destinazione
     switch_link_array.forEach(function(link) {
                 
@@ -31,13 +34,6 @@ function create_network(switch_id_array, switch_link_array, host_switch_link, ho
             
         edges.push({id: link, from: links[0], to: links[1] });
     });
-
-    /*
-    edges.forEach(function(edge) {
-
-        alert("from: "+ edge.from+ ", to: "+ edge.to);
-    });*/
-
 
     
            
@@ -49,10 +45,21 @@ function create_network(switch_id_array, switch_link_array, host_switch_link, ho
         edges.push({id: link, from: links[0], to: links[1], color: { color: "lime", highlight: "#3fff00", hover: "#3fff00"}});
     });
 
+    /*
+    edges.forEach(function(edge) {
+
+        alert("id: "+ edge.id+"from: "+ edge.from+ ", to: "+ edge.to);
+    });
+    */
+    
+    //si aggiornano i colori dei link, serve anche host_switch_link_id dato che contiene le porte collegate
+    edges1=updateEdgeColors(bandwidth_array, edges, host_switch_link_id, switch_link_id);
+    
+    
     //creazione dell'oggetto dati per il grafo
     var data = {
         nodes: nodes,
-        edges: edges
+        edges: edges1
     };
 
     //opzioni per la visualizzazione del grafo
@@ -161,6 +168,17 @@ function create_network(switch_id_array, switch_link_array, host_switch_link, ho
                 
                 //alert("entro3?");
 
+                //se i dati sono troppo grandi si inserisce la notazione scientifica
+                for(var i=0; i <table_hover.length; i++){
+                    
+                    if(table_hover[i] > 1000000){
+                       
+                        table_hover[i]=parseInt(table_hover[i]);
+                        table_hover[i]=table_hover[i].toExponential(2);   
+                    }
+
+                }
+
 
                 popupContent.innerHTML = "Host: " + links[0] + "<br>Switch: " + links[1]+ "<br> Port: "+port+ " Bandwidth: "+bandwidth[2]+"<br>"+
                 "<table id='table_host_switch'><tr><th>receive packets</th>"+
@@ -248,6 +266,21 @@ function create_network(switch_id_array, switch_link_array, host_switch_link, ho
                 }
 
                 //alert("entro5?");
+                //se i numeri sono troppo grandi si utilizza notazione scientifica, le due tabelle hanno stessa dimensione
+                for(var i=1; i <table_hover1.length; i++){
+                    
+                    if(table_hover1[i] > 1000000){
+
+                        table_hover1[i]=parseInt(table_hover1[i]);
+                        table_hover1[i]=table_hover1[i].toExponential(2);
+                        table_hover2[i]=parseInt(table_hover2[i]);
+                        table_hover2[i]=table_hover2[i].toExponential(2);
+                        
+                    }
+
+                    
+
+                }
 
                 popupContent.innerHTML = "src-Switch: " + links[0] + "<br> src-Port: "+ src_port + " src-Bandwidth:"+src_bandwidth+ "<br>dst-Switch: " + links[1] + "<br> dst-Port: " + dst_port +" dst-Bandwidth:"+dst_bandwidth+ "<br>"+
                 "<table id='table_host_switch1'><tr><th>direction</th>"+
@@ -369,9 +402,7 @@ function create_network(switch_id_array, switch_link_array, host_switch_link, ho
     });
     
 
-
-
-   
+    
 
 }
 
@@ -408,3 +439,135 @@ function get_switch_position(switch_statistics, hub, port){
     return x;
 }
 
+
+// Funzione per aggiornare i colori degli edge in base alla banda selezionata
+function updateEdgeColors(bandwidth_array, edges, host_switch_link_id, switch_link_id) {
+    // Recupera l'oggetto network dal container
+    var container = document.getElementById('container');
+    
+    
+
+    // Ottieni il riferimento all'elemento select
+    var selectElement = document.getElementById('bandwidth');
+
+    // Ottieni il valore selezionato
+    var selectedBandwidth = selectElement.value;
+    
+    var edgeBandwidth;
+    var edges1=[];
+    var port;
+    // Loop attraverso gli edge e aggiorna i colori in base alla banda selezionata
+    edges.forEach(function (edge) {
+        // Recupera l'id dell'edge
+        var edgeId = edge.id;
+        //alert("edgeId "+edgeId.length);
+        //alert("edgeId="+edgeId+"from="+edge.from+"to="+edge.to);
+
+        
+       
+        
+            //alert(links_array);
+            //se link tra host e switch 
+            if(edgeId.length == 41){
+
+               
+                for(var j=0; j<host_switch_link_id.length; j++){
+
+                    //controlla switch e porta e ricava la banda
+                    var check1=host_switch_link_id[j].split('-');
+                    //alert("check1="+check1[0]);
+                    //alert("check2="+check1);
+                    //bisogna controllare che lo switch sia quello nel link che si controlla
+                    if((check1[0]==edge.from) && (check1[1]==edge.to)){
+
+                        port=check1[2];
+                        //alert("bandwidth switch: "+ edgeBandwidth);
+                        break;
+                    }
+                }
+
+                for(var i=0;i<bandwidth_array.length;i++){
+       
+                    //si ricavano 
+                    var links_array = bandwidth_array[i].split('-');
+                    
+                    if((links_array[0]==edge.to) && (links_array[1]==port)){
+
+                        edgeBandwidth=links_array[2];
+                        //alert("bandwidth switch: "+ edgeBandwidth);
+                        break;
+                    }
+
+                } 
+
+            //se link tra switch 
+            }else if(edgeId.length == 47){
+               
+                for(var j=0; j<switch_link_id.length; j++){
+                    
+                    //controlla switch e porta sorgente e ricava la banda
+                    
+                    var check1=switch_link_id[j].split('-');
+                    //alert("check1="+check1);
+                    if((check1[0]==edge.from) && (check1[2]==edge.to)){
+
+                        port=check1[1];
+                        //alert("bandwidth switch: "+ edgeBandwidth);
+                        break;
+                    }
+                }
+
+                for(var i=0;i<bandwidth_array.length;i++){
+       
+                    //si ricavano 
+                    var links_array = bandwidth_array[i].split('-');
+                    
+                    if((links_array[0]==edge.from) && (links_array[1]==port)){
+
+                        edgeBandwidth=links_array[2];
+                        //alert("bandwidth switch: "+ edgeBandwidth);
+                        break;
+                    }
+
+                } 
+            }            
+        
+            //se numero grande e viene rappresentato con la virgola, si rimuove 
+            if(edgeBandwidth.indexOf(",") != -1){
+                //alert("edgeBandwidth.indexOf(,)= "+edgeBandwidth.indexOf(","));
+                var index=edgeBandwidth.indexOf(",");
+                var a=edgeBandwidth.substring(0, index);
+                var b=edgeBandwidth.substring(index+1, edgeBandwidth.length);
+                edgeBandwidth=a+b;
+            }
+        
+        // Verifica se la banda è inferiore alla prima cifra selezionata
+        if (parseFloat(edgeBandwidth) < parseFloat(selectedBandwidth.split('-')[0])) {
+            //alert(edgeBandwidth+"<"+ selectedBandwidth.split('-')[0]);
+            
+           
+            //alert("id:"+ edgeId+ "from:"+ links[0]+ "to:"+ links[1]);
+            edges1.push({id: edgeId, from: edge.from, to: edge.to, color: "lime"}); // Colore verde
+           
+            
+            
+        } else if (parseFloat(edgeBandwidth) >= parseFloat(selectedBandwidth.split('-')[0]) && parseFloat(edgeBandwidth) <= parseFloat(selectedBandwidth.split('-')[1])) {
+            //alert(edgeBandwidth+">"+ selectedBandwidth.split('-')[0]+"<"+ selectedBandwidth.split('-')[1]);
+            
+            //alert("id:"+ edgeId+ "from:"+ links[0]+ "to:"+ links[1]);
+            edges1.push({id: edgeId, from: edge.from, to: edge.to, color: '#F6BE00' }); // Colore giallo
+            
+
+        } else {
+           //alert(edgeBandwidth+">"+ selectedBandwidth.split('-')[1]);
+            
+            //alert("id:"+ edgeId+ "from:"+ links[0]+ "to:"+ links[1]);
+            edges1.push({id: edgeId, from: edge.from, to: edge.to, color: 'red' }); // Colore rosso
+            
+        }
+        
+    });
+
+    return edges1;
+    
+}
