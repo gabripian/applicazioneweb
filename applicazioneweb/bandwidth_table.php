@@ -25,10 +25,10 @@
     <body>
 
         <div class="navbar">
-            <a href="index.php"><img src="images/home.png" alt="Home Icon"> Topology (Home)</a>
+            <a href="index.php"><img id="a" src="images/home.png" alt="Home Icon"> Topology <div id="topology1">(Home)</div></a>
             <a href="flow_table.php"><img src="images/table.png" alt="Table Icon"> Flow Table</a>
             <a href="port_table.php"><img src="images/table.png" alt="Table Icon"> Port Table</a>
-            <a href="bandwidth_table.php"><img src="images/table.png" alt="Table Icon"> Band Table</a>
+            <a href="bandwidth_table.php"><img src="images/table.png" alt="Table Icon"> Througput <div id="monitoring">Monitoring</div></a>
         </div>
 
 
@@ -50,7 +50,7 @@
             $bandwidth_array=get_bandwidth($switch_id_array);
 
             //tabella delle porte
-            echo '<div class="flow_table">Bandwidth Table</div>';
+            echo '<div class="flow_table">Throughput Table</div>';
             
             
             //div contenente la tabella delle porte
@@ -60,8 +60,8 @@
                 <tr>
                     <th>switch id</th>
                     <th>port number</th>
-                    <th>bandwidth (bps)</th>
-                    <th>max bandwidth (bps)</th>
+                    <th>throughput (bps)</th>
+                    <th>max throughput (bps)</th>
                     <th>inactive time (sec)</th>
                     <th>duration (sec)</th>
                 </tr>';

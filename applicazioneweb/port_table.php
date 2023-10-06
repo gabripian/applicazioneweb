@@ -24,10 +24,10 @@
     <body>
 
         <div class="navbar">
-            <a href="index.php"><img src="images/home.png" alt="Home Icon"> Topology (Home)</a>
+            <a href="index.php"><img id="a" src="images/home.png" alt="Home Icon"> Topology <div id="topology1">(Home)</div></a>
             <a href="flow_table.php"><img src="images/table.png" alt="Table Icon"> Flow Table</a>
             <a href="port_table.php"><img src="images/table.png" alt="Table Icon"> Port Table</a>
-            <a href="bandwidth_table.php"><img src="images/table.png" alt="Table Icon"> Band Table</a>
+            <a href="bandwidth_table.php"><img src="images/table.png" alt="Table Icon"> Througput <div id="monitoring">Monitoring</div></a>
         </div>
 
 

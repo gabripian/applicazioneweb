@@ -44,10 +44,10 @@
         ?>
 
         <div class="navbar">
-            <a href="index.php"><img src="images/home.png" alt="Home Icon"> Topology (Home)</a>
+            <a href="index.php"><img id="a" src="images/home.png" alt="Home Icon"> Topology <div id="topology1">(Home)</div></a>
             <a href="flow_table.php"><img src="images/table.png" alt="Table Icon"> Flow Table</a>
             <a href="port_table.php"><img src="images/table.png" alt="Table Icon"> Port Table</a>
-            <a href="bandwidth_table.php"><img src="images/table.png" alt="Table Icon"> Band Table</a>
+            <a href="bandwidth_table.php"><img src="images/table.png" alt="Table Icon"> Througput <div id="monitoring">Monitoring</div></a>
         </div>
    
        
@@ -72,41 +72,73 @@
         </div>
     
         
-        <form>
-            <label for="bandwidth">Choose bandwidth range:</label>
-            <select name="bandwidth" id="bandwidth">
-                <option value="90-120">90-120</option>
-                <option value="110-140">110-140</option>
-                <option value="130-160">130-160</option>
-                <option value="150-180">150-180</option>
-            </select>
-            
+        <form id="myForm">
+            <label id="insert" for="bandwidth">Choose throughput range:</label><br><br>
+            <div id="insert1">
+            <label for="bandwidth"> min:</label>  
+            <input type="text" id="bandwidth" name="bandwidth" value="90">
+            <label for="bandwidth1"> max:</label>
+            <input type="text" id="bandwidth1" name="bandwidth1" value="110">
             <button id="button">Submit</button>
+            </div>
+            
            
         </form>
         <br>
+        <div id="check"></div>
         <br>
+        
 
         <script>
-            //si salva lo stato selezionato
-            var select = document.getElementById("bandwidth");
-            var button = document.getElementById("button");
-           
-            //si recupera il valore selezionato precedentemente da localStorage (se esiste)
-            var ultimoValoreSelezionato = localStorage.getItem("ultimoValoreSelezionato");
+            
 
-            //se un valore è stato memorizzato in precedenza, si assegna il valore
-            if (ultimoValoreSelezionato) {
-                select.value = ultimoValoreSelezionato;      
-            }
+            // Carica i valori precedentemente salvati in localStorage (se esistono)
+            document.getElementById("bandwidth").value = localStorage.getItem("minValue");
+            document.getElementById("bandwidth1").value = localStorage.getItem("maxValue");
 
-            button.addEventListener("click", function() {
-                //aggiorna l'ultimo valore selezionato
-                ultimoValoreSelezionato = select.value;
+            // Aggiungi un gestore di eventi al clic sul pulsante
+            document.getElementById("myForm").addEventListener("submit", function(event) {
+                // Ottieni i valori dai campi input
+                var min=document.getElementById("bandwidth").value;
+                var max=document.getElementById("bandwidth1").value;
+                var minValue = parseFloat(min);
+                var maxValue = parseFloat(max);
 
-                //memorizza il valore selezionato in localStorage
-                localStorage.setItem("ultimoValoreSelezionato", ultimoValoreSelezionato);
+                //alert("minValue "+ minValue);
+                //alert("maxValue "+ maxValue);
+
+                // Verifica se i valori sono validi
+                if(min == "" || max == ""){
+                    
+                    document.getElementById("check").innerHTML="Enter a number";
+                    event.preventDefault();
+
+                }else if(isNaN(min) || isNaN(max)){
+
+                    document.getElementById("check").innerHTML="Values must be numbers";
+                    event.preventDefault();
+
+                } else if (minValue < 0 || maxValue < 0) {
+
+                    //alert("Values must be positive");
+                    document.getElementById("check").innerHTML="Values must be positive";
+                    event.preventDefault(); // Impedisce l'invio del modulo
+
+                }else if (minValue  >= maxValue) {
+                    //alert("min must be lower than max");
+                    document.getElementById("check").innerHTML ="min must be lower than max";
+                    //x.querySelector("insert1")
+                    event.preventDefault(); // Impedisce l'invio del modulo
+                }
+
+
+                // Salva i valori in localStorage
+                localStorage.setItem("minValue", minValue);
+                localStorage.setItem("maxValue", maxValue);
+                
             });
+
+           
         </script>
         
         

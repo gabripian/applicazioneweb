@@ -180,7 +180,7 @@ function create_network(switch_id_array, switch_link_array, host_switch_link, ho
                 }
 
 
-                popupContent.innerHTML = "Host: " + links[0] + "<br>Switch: " + links[1]+ "<br> Port: "+port+ " Bandwidth: "+bandwidth[2]+"<br>"+
+                popupContent.innerHTML = "Host: " + links[0] + "<br>Switch: " + links[1]+ "<br> Port: "+port+ " Throughput: "+bandwidth[2]+"<br>"+
                 "<table id='table_host_switch'><tr><th>receive packets</th>"+
                 "<th>transmit packets</th>"+
                 "<th>receive bytes</th>"+
@@ -282,7 +282,7 @@ function create_network(switch_id_array, switch_link_array, host_switch_link, ho
 
                 }
 
-                popupContent.innerHTML = "src-Switch: " + links[0] + "<br> src-Port: "+ src_port + " src-Bandwidth:"+src_bandwidth+ "<br>dst-Switch: " + links[1] + "<br> dst-Port: " + dst_port +" dst-Bandwidth:"+dst_bandwidth+ "<br>"+
+                popupContent.innerHTML = "src-Switch: " + links[0] + "<br> src-Port: "+ src_port + " src-Throughput:"+src_bandwidth+ "<br>dst-Switch: " + links[1] + "<br> dst-Port: " + dst_port +" dst-Throughput:"+dst_bandwidth+ "<br>"+
                 "<table id='table_host_switch1'><tr><th>direction</th>"+
                 "<th>receive packets</th>"+
                 "<th>transmit packets</th>"+
@@ -449,9 +449,11 @@ function updateEdgeColors(bandwidth_array, edges, host_switch_link_id, switch_li
 
     // Ottieni il riferimento all'elemento select
     var selectElement = document.getElementById('bandwidth');
+    var selectElement1 = document.getElementById('bandwidth1');
 
     // Ottieni il valore selezionato
-    var selectedBandwidth = selectElement.value;
+    var min = selectElement.value;
+    var max = selectElement1.value;
     
     var edgeBandwidth;
     var edges1=[];
@@ -463,107 +465,112 @@ function updateEdgeColors(bandwidth_array, edges, host_switch_link_id, switch_li
         //alert("edgeId "+edgeId.length);
         //alert("edgeId="+edgeId+"from="+edge.from+"to="+edge.to);
 
-        
-       
-        
-            //alert(links_array);
-            //se link tra host e switch 
-            if(edgeId.length == 41){
+            //se i valori nel campo di input non sono validi il colore rimane blu
+            if (min == "" || max == "" || isNaN(min) || isNaN(max) || parseFloat(min) < 0 || parseFloat(max) < 0 || parseFloat(min)  >= parseFloat(max)){
 
-               
-                for(var j=0; j<host_switch_link_id.length; j++){
+                edges1.push({id: edgeId, from: edge.from, to: edge.to, color: " rgb(0,115,207)"});
 
-                    //controlla switch e porta e ricava la banda
-                    var check1=host_switch_link_id[j].split('-');
-                    //alert("check1="+check1[0]);
-                    //alert("check2="+check1);
-                    //bisogna controllare che lo switch sia quello nel link che si controlla
-                    if((check1[0]==edge.from) && (check1[1]==edge.to)){
+            }else{
 
-                        port=check1[2];
-                        //alert("bandwidth switch: "+ edgeBandwidth);
-                        break;
+                //alert(links_array);
+                //se link tra host e switch 
+                if(edgeId.length == 41){
+
+                
+                    for(var j=0; j<host_switch_link_id.length; j++){
+
+                        //controlla switch e porta e ricava la banda
+                        var check1=host_switch_link_id[j].split('-');
+                        //alert("check1="+check1[0]);
+                        //alert("check2="+check1);
+                        //bisogna controllare che lo switch sia quello nel link che si controlla
+                        if((check1[0]==edge.from) && (check1[1]==edge.to)){
+
+                            port=check1[2];
+                            //alert("bandwidth switch: "+ edgeBandwidth);
+                            break;
+                        }
                     }
+
+                    for(var i=0;i<bandwidth_array.length;i++){
+        
+                        //si ricavano 
+                        var links_array = bandwidth_array[i].split('-');
+                        
+                        if((links_array[0]==edge.to) && (links_array[1]==port)){
+
+                            edgeBandwidth=links_array[2];
+                            //alert("bandwidth switch: "+ edgeBandwidth);
+                            break;
+                        }
+
+                    } 
+
+                //se link tra switch 
+                }else if(edgeId.length == 47){
+                
+                    for(var j=0; j<switch_link_id.length; j++){
+                        
+                        //controlla switch e porta sorgente e ricava la banda
+                        
+                        var check1=switch_link_id[j].split('-');
+                        //alert("check1="+check1);
+                        if((check1[0]==edge.from) && (check1[2]==edge.to)){
+
+                            port=check1[1];
+                            //alert("bandwidth switch: "+ edgeBandwidth);
+                            break;
+                        }
+                    }
+
+                    for(var i=0;i<bandwidth_array.length;i++){
+        
+                        //si ricavano 
+                        var links_array = bandwidth_array[i].split('-');
+                        
+                        if((links_array[0]==edge.from) && (links_array[1]==port)){
+
+                            edgeBandwidth=links_array[2];
+                            //alert("bandwidth switch: "+ edgeBandwidth);
+                            break;
+                        }
+
+                    } 
+                }            
+            
+                //se numero grande e viene rappresentato con la virgola, si rimuove 
+                if(edgeBandwidth.indexOf(",") != -1){
+                    //alert("edgeBandwidth.indexOf(,)= "+edgeBandwidth.indexOf(","));
+                    var index=edgeBandwidth.indexOf(",");
+                    var a=edgeBandwidth.substring(0, index);
+                    var b=edgeBandwidth.substring(index+1, edgeBandwidth.length);
+                    edgeBandwidth=a+b;
                 }
+            
+            // Verifica se la banda è inferiore alla prima cifra selezionata
+            if (parseFloat(edgeBandwidth) < parseFloat(min)) {
+                //alert(edgeBandwidth+"<"+ selectedBandwidth.split('-')[0]);
+                
+            
+                //alert("id:"+ edgeId+ "from:"+ links[0]+ "to:"+ links[1]);
+                edges1.push({id: edgeId, from: edge.from, to: edge.to, color: "lime"}); // Colore verde
+            
+                
+                
+            } else if (parseFloat(edgeBandwidth) >= parseFloat(min) && parseFloat(edgeBandwidth) <= parseFloat(max)) {
+                //alert(edgeBandwidth+">"+ selectedBandwidth.split('-')[0]+"<"+ selectedBandwidth.split('-')[1]);
+                
+                //alert("id:"+ edgeId+ "from:"+ links[0]+ "to:"+ links[1]);
+                edges1.push({id: edgeId, from: edge.from, to: edge.to, color: '#F6BE00' }); // Colore giallo
+                
 
-                for(var i=0;i<bandwidth_array.length;i++){
-       
-                    //si ricavano 
-                    var links_array = bandwidth_array[i].split('-');
-                    
-                    if((links_array[0]==edge.to) && (links_array[1]==port)){
-
-                        edgeBandwidth=links_array[2];
-                        //alert("bandwidth switch: "+ edgeBandwidth);
-                        break;
-                    }
-
-                } 
-
-            //se link tra switch 
-            }else if(edgeId.length == 47){
-               
-                for(var j=0; j<switch_link_id.length; j++){
-                    
-                    //controlla switch e porta sorgente e ricava la banda
-                    
-                    var check1=switch_link_id[j].split('-');
-                    //alert("check1="+check1);
-                    if((check1[0]==edge.from) && (check1[2]==edge.to)){
-
-                        port=check1[1];
-                        //alert("bandwidth switch: "+ edgeBandwidth);
-                        break;
-                    }
-                }
-
-                for(var i=0;i<bandwidth_array.length;i++){
-       
-                    //si ricavano 
-                    var links_array = bandwidth_array[i].split('-');
-                    
-                    if((links_array[0]==edge.from) && (links_array[1]==port)){
-
-                        edgeBandwidth=links_array[2];
-                        //alert("bandwidth switch: "+ edgeBandwidth);
-                        break;
-                    }
-
-                } 
-            }            
-        
-            //se numero grande e viene rappresentato con la virgola, si rimuove 
-            if(edgeBandwidth.indexOf(",") != -1){
-                //alert("edgeBandwidth.indexOf(,)= "+edgeBandwidth.indexOf(","));
-                var index=edgeBandwidth.indexOf(",");
-                var a=edgeBandwidth.substring(0, index);
-                var b=edgeBandwidth.substring(index+1, edgeBandwidth.length);
-                edgeBandwidth=a+b;
+            } else {
+            //alert(edgeBandwidth+">"+ selectedBandwidth.split('-')[1]);
+                
+                //alert("id:"+ edgeId+ "from:"+ links[0]+ "to:"+ links[1]);
+                edges1.push({id: edgeId, from: edge.from, to: edge.to, color: 'red' }); // Colore rosso
+                
             }
-        
-        // Verifica se la banda è inferiore alla prima cifra selezionata
-        if (parseFloat(edgeBandwidth) < parseFloat(selectedBandwidth.split('-')[0])) {
-            //alert(edgeBandwidth+"<"+ selectedBandwidth.split('-')[0]);
-            
-           
-            //alert("id:"+ edgeId+ "from:"+ links[0]+ "to:"+ links[1]);
-            edges1.push({id: edgeId, from: edge.from, to: edge.to, color: "lime"}); // Colore verde
-           
-            
-            
-        } else if (parseFloat(edgeBandwidth) >= parseFloat(selectedBandwidth.split('-')[0]) && parseFloat(edgeBandwidth) <= parseFloat(selectedBandwidth.split('-')[1])) {
-            //alert(edgeBandwidth+">"+ selectedBandwidth.split('-')[0]+"<"+ selectedBandwidth.split('-')[1]);
-            
-            //alert("id:"+ edgeId+ "from:"+ links[0]+ "to:"+ links[1]);
-            edges1.push({id: edgeId, from: edge.from, to: edge.to, color: '#F6BE00' }); // Colore giallo
-            
-
-        } else {
-           //alert(edgeBandwidth+">"+ selectedBandwidth.split('-')[1]);
-            
-            //alert("id:"+ edgeId+ "from:"+ links[0]+ "to:"+ links[1]);
-            edges1.push({id: edgeId, from: edge.from, to: edge.to, color: 'red' }); // Colore rosso
-            
         }
         
     });
